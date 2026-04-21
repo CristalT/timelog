@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Allowlist readable by any authenticated user (needed for the client-side check)
+    match /config/allowlist {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Family data: accessible if authenticated AND (no allowlist exists OR email is listed)
+    match /families/{familyId}/{document=**} {
+      allow read, write: if request.auth != null && (
+        !exists(/databases/$(database)/documents/config/allowlist) ||
+        request.auth.token.email in get(/databases/$(database)/documents/config/allowlist).data.emails
+      );
+    }
+  }
+}
