@@ -157,8 +157,17 @@ function buildReportImage(): Promise<Blob> {
     })
 
     const totalY = headerY + HEADER_H + rows.length * ROW_H
+    const r = 12
     ctx.fillStyle = '#1e1b4b'
-    ctx.fillRect(PAD, totalY, tableW, TOTAL_H)
+    ctx.beginPath()
+    ctx.moveTo(PAD, totalY)
+    ctx.lineTo(PAD + tableW, totalY)
+    ctx.lineTo(PAD + tableW, totalY + TOTAL_H - r)
+    ctx.quadraticCurveTo(PAD + tableW, totalY + TOTAL_H, PAD + tableW - r, totalY + TOTAL_H)
+    ctx.lineTo(PAD + r, totalY + TOTAL_H)
+    ctx.quadraticCurveTo(PAD, totalY + TOTAL_H, PAD, totalY + TOTAL_H - r)
+    ctx.closePath()
+    ctx.fill()
 
     ctx.font = `bold 12px ${font}`
     ctx.fillStyle = '#ffffff'
