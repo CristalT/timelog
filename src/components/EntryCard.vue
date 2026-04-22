@@ -7,11 +7,12 @@ const emit = defineEmits<{ delete: [id: string] }>()
 
 const showConfirm = ref(false)
 
-function fmt(iso: string) {
-  return new Date(iso).toLocaleString('es-AR', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  })
+function fmtDate(iso: string) {
+  return new Date(iso).toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+}
+
+function fmtTime(iso: string) {
+  return new Date(iso).toLocaleString('es-AR', { hour: '2-digit', minute: '2-digit' })
 }
 
 function fmtHours(h: number) {
@@ -28,19 +29,33 @@ function fmtMoney(n: number) {
 <template>
   <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-start justify-between gap-3">
     <div class="flex-1 min-w-0">
-      <p class="text-xs text-gray-400 mb-1">Ingreso</p>
-      <p class="text-sm font-medium text-gray-800">{{ fmt(entry.checkIn) }}</p>
-      <p class="text-xs text-gray-400 mt-2 mb-1">Salida</p>
-      <p class="text-sm font-medium text-gray-800">{{ fmt(entry.checkOut) }}</p>
+      <p class="text-xs font-medium text-gray-500 mb-2">{{ fmtDate(entry.checkIn) }}</p>
+      <div class="flex items-center gap-3">
+        <div>
+          <p class="text-xs text-gray-400 mb-0.5">Ingreso</p>
+          <p class="text-sm font-medium text-gray-800">{{ fmtTime(entry.checkIn) }}</p>
+        </div>
+        <span class="text-gray-300 text-sm">→</span>
+        <div>
+          <p class="text-xs text-gray-400 mb-0.5">Salida</p>
+          <p class="text-sm font-medium text-gray-800">{{ fmtTime(entry.checkOut) }}</p>
+        </div>
+      </div>
     </div>
     <div class="text-right shrink-0">
       <p class="text-lg font-bold text-indigo-600">{{ fmtHours(entry.hoursWorked) }}</p>
       <p class="text-sm font-semibold text-green-600">{{ fmtMoney(entry.amount) }}</p>
+      <p class="text-xs text-gray-400 mt-0.5">{{ fmtMoney(entry.amount / entry.hoursWorked) }}/h</p>
       <button
-        class="mt-3 text-xs text-red-400 hover:text-red-600 transition-colors"
+        class="mt-3 text-red-300 hover:text-red-500 transition-colors"
         @click="showConfirm = true"
       >
-        Eliminar
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+          <path d="M10 11v6M14 11v6" />
+          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+        </svg>
       </button>
     </div>
   </div>

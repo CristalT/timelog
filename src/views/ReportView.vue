@@ -34,11 +34,62 @@ function fmtHours(h: number) {
 function fmtMoney(n: number) {
   return n.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 })
 }
+
+const copied = ref(false)
+
+function buildReportText() {
+  const label = new Date(currentYear.value, currentMonth.value - 1)
+    .toLocaleString('es-AR', { month: 'long', year: 'numeric' })
+
+  const lines = entries.value.map((e) => {
+    const date = new Date(e.checkIn).toLocaleString('es-AR', { day: '2-digit', month: '2-digit' })
+    const timeIn = new Date(e.checkIn).toLocaleString('es-AR', { hour: '2-digit', minute: '2-digit' })
+    const timeOut = new Date(e.checkOut).toLocaleString('es-AR', { hour: '2-digit', minute: '2-digit' })
+    const rate = fmtMoney(e.amount / e.hoursWorked)
+    return `${date}  ${timeIn} → ${timeOut}  ${fmtHours(e.hoursWorked)}  ${rate}/h  ${fmtMoney(e.amount)}`
+  })
+
+  const { totalHours, totalAmount } = summary.value
+  return [
+    `Reporte de horas — ${label}`,
+    '',
+    ...lines,
+    '',
+    `Total: ${fmtHours(totalHours)}  |  ${fmtMoney(totalAmount)}`,
+  ].join('\n')
+}
+
+async function shareReport() {
+  const text = buildReportText()
+  if (navigator.share) {
+    await navigator.share({ text })
+  } else {
+    await navigator.clipboard.writeText(text)
+    copied.value = true
+    setTimeout(() => { copied.value = false }, 2000)
+  }
+}
 </script>
 
 <template>
   <main class="p-4 max-w-lg mx-auto">
-    <h1 class="text-xl font-bold text-gray-900 mb-4 mt-2">Reporte mensual</h1>
+    <div class="flex items-center justify-between mb-4 mt-2">
+      <h1 class="text-xl font-bold text-gray-900">Reporte mensual</h1>
+      <button
+        v-if="entries.length > 0"
+        class="flex items-center gap-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
+        @click="shareReport"
+      >
+        <svg v-if="!copied" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+        <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span :class="copied ? 'text-green-500' : ''">{{ copied ? 'Copiado' : 'Compartir' }}</span>
+      </button>
+    </div>
 
     <div class="flex items-center justify-between mb-4">
       <button
