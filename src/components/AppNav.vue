@@ -20,7 +20,7 @@ async function handleSignOut() {
 </script>
 
 <template>
-  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex items-stretch">
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex items-stretch pb-4">
     <router-link
       v-for="link in links"
       :key="link.to"
@@ -28,7 +28,7 @@ async function handleSignOut() {
       class="flex-1 flex flex-col items-center py-2 text-xs transition-colors"
       :class="route.path === link.to ? 'text-indigo-600' : 'text-gray-500'"
     >
-      <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+      <svg class="size-8 mb-0.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" :d="link.icon" />
       </svg>
       {{ link.label }}
